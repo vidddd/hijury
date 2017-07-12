@@ -1,0 +1,161 @@
+
+audiofield.jplayer:
+  remote: https://github.com/happyworm/jplayer
+  version: "4.7.0"
+  license:
+    name: MIT
+    url: https://github.com/happyworm/jPlayer/blob/master/MIT-LICENSE.txt
+    gpl-compatible: true
+  css:
+    component:
+      /libraries/jplayer/lib/circle-player/skin/circle.player.css: {}
+      css/audiofield.css: {}
+  js:
+    /libraries/jplayer/dist/jplayer/jquery.jplayer.min.js: { minified: true }
+    js/jplayer.builder.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+
+audiofield.jplayer.playlist:
+  js:
+    /libraries/jplayer/dist/add-on/jplayer.playlist.min.js: { minified: true }
+  dependencies:
+    - audiofield/audiofield.jplayer
+
+audiofield.jplayer.inspector:
+  js:
+    /libraries/jplayer/dist/add-on/jquery.jplayer.inspector.min.js: { minified: true }
+  dependencies:
+    - audiofield/audiofield.jplayer
+
+audiofield.jplayer.transform2d:
+  js:
+    /libraries/jplayer/lib/circle-player/js/jquery.transform2d.js: {}
+
+audiofield.jplayer.grab:
+  js:
+    /libraries/jplayer/lib/circle-player/js/jquery.grab.js: {}
+
+audiofield.jplayer.csstransforms:
+  js:
+    /libraries/jplayer/lib/circle-player/js/mod.csstransforms.min.js: { minified: true }
+
+audiofield.jplayer.theme_jplayer_circle:
+  css:
+    component:
+      /libraries/jplayer/lib/circle-player/skin/circle.player.css: {}
+  js:
+    js/jplayer.circleplayer.fix.js: {}
+    /libraries/jplayer/lib/circle-player/js/circle.player.js: {}
+  dependencies:
+    - audiofield/audiofield.jplayer
+    - audiofield/audiofield.jplayer_transform2d
+    - audiofield/audiofield.jplayer.grab
+    - audiofield/audiofield.jplayer.csstransforms
+
+audiofield.wordpress:
+  remote: http://wpaudioplayer.com
+  version: "2.0"
+  license:
+    name: MIT
+    url: http://wpaudioplayer.com/license
+    gpl-compatible: true
+  js:
+    /libraries/wordpress-audio/audio-player.js: {}
+    js/wordpress.builder.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+
+audiofield.mediaelement:
+  remote: http://mediaelementjs.com
+  version: "2.32.2"
+  license:
+    name: MIT
+    url: https://github.com/johndyer/mediaelement
+    gpl-compatible: true
+  css:
+    component:
+      /libraries/mediaelement/build/mediaelementplayer.min.css: { minified: true }
+      css/audiofield.css: {}
+      css/audiofield.mediaelement.css: {}
+  js:
+    /libraries/mediaelement/build/mediaelement-and-player.min.js: { minified: true }
+    js/mediaelement.builder.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+
+audiofield.soundmanager:
+  remote: http://www.schillmania.com/projects/soundmanager2
+  version: "2"
+  license:
+    name: BSD
+    url: http://www.schillmania.com/projects/soundmanager2/license.txt
+    gpl-compatible: true
+  js:
+    /libraries/soundmanager/script/soundmanager2-nodebug-jsmin.js: { minified: true }
+    js/soundmanager.builder.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+
+audiofield.soundmanager.default:
+  css:
+    component:
+     /libraries/soundmanager/demo/mp3-player-button/css/mp3-player-button.css: {}
+  js:
+    /libraries/soundmanager/demo/mp3-player-button/script/mp3-player-button.js: {}
+  dependencies:
+    - audiofield/audiofield.soundmanager
+
+audiofield.soundmanager.player360:
+  css:
+    component:
+     /libraries/soundmanager/demo/360-player/360player.css: {}
+  js:
+    /libraries/soundmanager/demo/360-player/script/berniecode-animator.js: {}
+    /libraries/soundmanager/demo/360-player/script/360player.js: {}
+  dependencies:
+    - audiofield/audiofield.soundmanager
+
+audiofield.soundmanager.barui:
+  css:
+    component:
+     /libraries/soundmanager/demo/bar-ui/css/bar-ui.css: {}
+  js:
+    /libraries/soundmanager/demo/bar-ui/script/bar-ui.js: {}
+  dependencies:
+    - audiofield/audiofield.soundmanager
+
+audiofield.soundmanager.inlineplayer:
+  css:
+    component:
+     /libraries/soundmanager/demo/play-mp3-links/css/inlineplayer.css: {}
+  js:
+    /libraries/soundmanager/demo/play-mp3-links/script/inlineplayer.js: {}
+  dependencies:
+    - audiofield/audiofield.soundmanager
+
+audiofield.audiojs:
+  remote: http://kolber.github.io/audiojs/
+  version: "1"
+  license:
+    name: MIT
+    url: http://kolber.github.io/audiojs/
+    gpl-compatible: true
+  css:
+    component:
+      css/audiofield.audiojs.css: {}
+  js:
+    /libraries/audiojs/audio.min.js: { minified: true }
+    js/audiojs.builder.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings

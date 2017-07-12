@@ -1,0 +1,76 @@
+<?php
+
+/**
+ * @file
+ * Installation file for Audiofield module.
+ */
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_requirements().
+ */
+function audiofield_requirements($phase) {
+  $requirements = [];
+
+  if ($phase == 'runtime') {
+    $requirements['audiofield'] = [
+      'title' => t('AudioField Players'),
+      'severity' => REQUIREMENT_INFO,
+      'value' => '',
+      'description' => [
+        'installed' => [
+          '#theme' => 'item_list',
+          '#items' => [],
+          '#title' => '',
+          '#list_type' => 'ul',
+          '#attributes' => [],
+        ],
+        'uninstalled' => [
+          '#theme' => 'item_list',
+          '#items' => [],
+          '#title' => '',
+          '#list_type' => 'ul',
+          '#attributes' => [],
+        ],
+      ],
+    ];
+
+    // Loop over core libraries and make sure they are installed.
+    foreach (['audiojs', 'jplayer', 'mediaelement', 'soundmanager', 'wordpress'] as $library_name) {
+      // Get the library.
+      $library = \Drupal::service('library.discovery')->getLibraryByName('audiofield', 'audiofield.' . $library_name);
+      // Get the root installation directory.
+      $root_dir = '/' . preg_filter('%(^libraries/[^//]+).*%', '$1', $library['js'][0]['data']);
+      // Check if the required files are accessible.
+      if ($library === FALSE || !isset($library['js'][0]['data']) || !file_exists(DRUPAL_ROOT . '/' . $library['js'][0]['data'])) {
+        // Show a warning here as something is not installed.
+        $requirements['audiofield']['description']['uninstalled']['#prefix'] = t('Unavailable players');
+        // Try to print the install directory (will fail if the library itself
+        // is broken somehow).
+        try {
+          $requirements['audiofield']['description']['uninstalled']['#items'][] = t(':library_name library has not been installed. Download from <a href=":url">:url</a> and install in :root_dir', [
+            ':library_name' => $library_name,
+            ':root_dir' => $root_dir,
+            ':url' => Url::fromUri($library['remote'])->toString(),
+          ]);
+        }
+        catch (Exception $e) {
+          $requirements['audiofield']['description']['uninstalled']['#items'][] = t(':library_name library has not been installed. Download and install in :root_dir', [
+            ':library_name' => $library_name,
+            ':root_dir' => $root_dir,
+          ]);
+        }
+      }
+      else {
+        $requirements['audiofield']['description']['installed']['#prefix'] = t('Available players');
+        $requirements['audiofield']['description']['installed']['#items'][] = t(':library_name library has been successfully installed at :root_dir', [
+          ':library_name' => $library_name,
+          ':root_dir' => $root_dir,
+        ]);
+      }
+    }
+  }
+
+  return $requirements;
+}
