@@ -1,0 +1,25 @@
+name: Hijury
+type: theme
+description: 'Theme for hijury'
+core: 8.x
+libraries:
+  - fluffiness/global-styling
+  - hijury/global
+base theme: stable
+regions:
+  header: Header
+  content: Content
+  sidebar_first: 'Sidebar first'
+  footer: Footer
+stylesheets-remove:
+  - '@classy/css/components/tabs.css'
+  - core/assets/vendor/normalize-css/normalize.css
+  - core/modules/system/css/system.module.css
+  - core/modules/system/css/system.theme.css
+  - core/modules/views/css/views.module.css
+  - core/themes/stable/css/system/components/system-status-counter.css
+  - core/themes/stable/css/system/components/system-status-report-counters.css
+  - core/themes/stable/css/system/components/system-status-report-general-info.css
+  - core/themes/stable/css/system/components/sticky-header.module.css
+  - core/themes/stable/css/system/components/tabledrag.module.css
+  - core/themes/stable/css/system/components/tablesort.module.css

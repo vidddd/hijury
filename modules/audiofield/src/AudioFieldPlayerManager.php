@@ -23,7 +23,7 @@ class AudioFieldPlayerManager extends DefaultPluginManager {
    *   The module handler.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/AudioPlayer', $namespaces, $module_handler, 'Drupal\audiofield\AudioFieldPluginInterface', 'Drupal\audiofield\Annotation\AudioPlayer');
+    parent::__construct('Plugin/AudioPlayer', $namespaces, $module_handler, 'Drupal\audiofield\AudioFieldPluginBase', 'Drupal\audiofield\Annotation\AudioPlayer');
 
     $this->alterInfo('audiofield');
     $this->setCacheBackend($cache_backend, 'audiofield_audioplayer');

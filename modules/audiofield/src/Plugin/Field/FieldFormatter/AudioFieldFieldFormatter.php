@@ -6,23 +6,23 @@ use Drupal\audiofield\AudioFieldPlayerManager;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
+use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Base class for audio file formatters.
+ * Plugin implementation of audio player file formatter.
  *
  * @FieldFormatter(
  *   id = "audiofield_audioplayer",
- *   label = @Translation("Audio Player"),
+ *   label = @Translation("Audiofield Audio Player"),
  *   field_types = {
- *     "file"
+ *     "file", "link"
  *   }
  * )
  */
-class AudioFieldFieldFormatter extends FileFormatterBase implements ContainerFactoryPluginInterface {
+class AudioFieldFieldFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
 
   protected $audioPlayerManager;
 
@@ -47,7 +47,7 @@ class AudioFieldFieldFormatter extends FileFormatterBase implements ContainerFac
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('audiofield.player_manager')
+      $container->get('plugin.manager.audiofield')
     );
   }
 
@@ -122,11 +122,24 @@ class AudioFieldFieldFormatter extends FileFormatterBase implements ContainerFac
         ],
       ],
     ];
+    // Settings for WaveSurfer.
+    // Only show when WaveSurfer is the selected audio player.
+    $elements['audio_player_wavesurfer_combine_files'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Combine audio files into a single audio player'),
+      '#description' => $this->t('By default Wavesurfer displays files individually. This option combines the files into a playlist so only one file shows at a time.'),
+      '#default_value' => $this->getSetting('audio_player_wavesurfer_combine_files'),
+      '#states' => [
+        'visible' => [
+          ':input[name="fields[' . $fieldname . '][settings_edit_form][settings][audio_player]"]' => ['value' => 'wavesurfer_audio_player'],
+        ],
+      ],
+    ];
     // Settings for WordPress.
     // Only show when WordPress is the selected audio player.
     $elements['audio_player_wordpress_combine_files'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Combine mp3 files into a single audio player'),
+      '#title' => $this->t('Combine audio files into a single audio player'),
       '#description' => $this->t('This can be more difficult to see for the WordPress plugin. Multiple files are represented only by small "next" and "previous" arrows. Unchecking this box causes each file to be rendered as its own player.'),
       '#default_value' => $this->getSetting('audio_player_wordpress_combine_files'),
       '#states' => [
@@ -175,11 +188,19 @@ class AudioFieldFieldFormatter extends FileFormatterBase implements ContainerFac
         'visible' => [
           [':input[name="fields[' . $fieldname . '][settings_edit_form][settings][audio_player]"]' => ['value' => 'jplayer_audio_player']],
           [':input[name="fields[' . $fieldname . '][settings_edit_form][settings][audio_player]"]' => ['value' => 'mediaelement_audio_player']],
+          [':input[name="fields[' . $fieldname . '][settings_edit_form][settings][audio_player]"]' => ['value' => 'projekktor_audio_player']],
           [':input[name="fields[' . $fieldname . '][settings_edit_form][settings][audio_player]"]' => ['value' => 'soundmanager_audio_player']],
+          [':input[name="fields[' . $fieldname . '][settings_edit_form][settings][audio_player]"]' => ['value' => 'wavesurfer_audio_player']],
           [':input[name="fields[' . $fieldname . '][settings_edit_form][settings][audio_player]"]' => ['value' => 'wordpress_audio_player']],
         ],
       ],
     ];
+    // Setting for optional download link.
+    $elements['download_link'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Display download link below player'),
+      '#default_value' => $this->getSetting('download_link'),
+    );
 
     return $elements;
   }
@@ -214,9 +235,13 @@ class AudioFieldFieldFormatter extends FileFormatterBase implements ContainerFac
       }
       $summary[] = Markup::create('Skin: <strong>' . $theme . '</strong>');
     }
+    // If this is wavesurfer, add those settings.
+    elseif ($settings['audio_player'] == 'wavesurfer_audio_player') {
+      $summary[] = Markup::create('Combine files into single player? <strong>' . ($settings['audio_player_wavesurfer_combine_files'] ? 'Yes' : 'No') . '</strong>');
+    }
     // If this is wordpress, add those settings.
     elseif ($settings['audio_player'] == 'wordpress_audio_player') {
-      $summary[] = Markup::create('Combine mp3s into single player? <strong>' . ($settings['audio_player_wordpress_combine_files'] ? 'Yes' : 'No') . '</strong>');
+      $summary[] = Markup::create('Combine files into single player? <strong>' . ($settings['audio_player_wordpress_combine_files'] ? 'Yes' : 'No') . '</strong>');
       $summary[] = Markup::create('Animate player? <strong>' . ($settings['audio_player_wordpress_animation'] ? 'Yes' : 'No') . '</strong>');
     }
     // If this is soundmanager, add those settings.
@@ -232,9 +257,11 @@ class AudioFieldFieldFormatter extends FileFormatterBase implements ContainerFac
     // Show combined settings for multiple players.
     if (in_array($settings['audio_player'], [
       'jplayer_audio_player',
-      'wordpress_audio_player',
       'mediaelement_audio_player',
+      'projekktor_audio_player',
       'soundmanager_audio_player',
+      'wavesurfer_audio_player',
+      'wordpress_audio_player',
     ])) {
       // Display volume.
       $summary[] = Markup::create('Initial volume: <strong>' . $settings['audio_player_initial_volume'] . ' out of 10</strong>');
@@ -244,6 +271,9 @@ class AudioFieldFieldFormatter extends FileFormatterBase implements ContainerFac
     if (!$player->checkInstalled()) {
       $summary[] = Markup::create('<strong style="color:red;">' . t('Error: this player library is currently not installed. Please select another player or reinstall the library.') . '</strong>');
     }
+
+    // Show whether or not we are displaying direct downloads.
+    $summary[] = Markup::create('Display download link: <strong>' . ($settings['download_link'] ? 'Yes' : 'No') . '</strong>');
 
     return $summary;
   }
@@ -255,10 +285,12 @@ class AudioFieldFieldFormatter extends FileFormatterBase implements ContainerFac
     return array(
       'audio_player' => 'default_mp3_player',
       'audio_player_jplayer_theme' => 'none',
+      'audio_player_wavesurfer_combine_files' => FALSE,
       'audio_player_wordpress_combine_files' => FALSE,
       'audio_player_wordpress_animation' => TRUE,
       'audio_player_soundmanager_theme' => 'default',
       'audio_player_initial_volume' => 8,
+      'download_link' => FALSE,
     ) + parent::defaultSettings();
   }
 
@@ -277,7 +309,6 @@ class AudioFieldFieldFormatter extends FileFormatterBase implements ContainerFac
     $player = $this->audioPlayerManager->createInstance($plugin_id);
 
     $elements[] = $player->renderPlayer($items, $langcode, $this->getSettings());
-
     return $elements;
   }
 

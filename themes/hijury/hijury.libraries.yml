@@ -1,0 +1,9 @@
+global:
+  css:
+    theme:
+      css/estilos.css: {}
+  js:
+    js/main.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.ui.tabs

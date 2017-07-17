@@ -2,11 +2,9 @@
 
 namespace Drupal\audiofield\Plugin\AudioPlayer;
 
-use Drupal\audiofield\AudioFieldPluginInterface;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Url;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Component\Utility\Random;
+use Drupal\audiofield\AudioFieldPluginBase;
 
 /**
  * Implements the WordPress Audio Player plugin.
@@ -14,20 +12,15 @@ use Drupal\Component\Utility\Random;
  * @AudioPlayer (
  *   id = "wordpress_audio_player",
  *   title = @Translation("WordPress audio player"),
+ *   description = @Translation("Standalone audio player originally built for WordPress"),
  *   fileTypes = {
  *     "mp3",
  *   },
- *   description = "WordPress player to play audio files."
+ *   libraryName = "wordpress",
+ *   librarySource = "http://wpaudioplayer.com",
  * )
  */
-class WordPressAudioPlayer implements AudioFieldPluginInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function description() {
-    return t('Plugin for use of the WordPress audio player for display of audio files. Player can be found at http://wpaudioplayer.com');
-  }
+class WordPressAudioPlayer extends AudioFieldPluginBase {
 
   /**
    * {@inheritdoc}
@@ -35,9 +28,8 @@ class WordPressAudioPlayer implements AudioFieldPluginInterface {
   public function renderPlayer(FieldItemListInterface $items, $langcode, $settings) {
     // Check to make sure we're installed.
     if (!$this->checkInstalled()) {
-      drupal_set_message(t('Error: audiofield library is not currently installed! See the @status_report for more information.', [
-        '@status_report' => \Drupal::l(t('status report'), Url::fromRoute('system.status')),
-      ]), 'error');
+      // Show the error.
+      $this->showInstallError();
 
       // Simply return the default rendering so the files are still displayed.
       $default_player = new DefaultMp3Player();
@@ -55,32 +47,21 @@ class WordPressAudioPlayer implements AudioFieldPluginInterface {
     // Create an array to hold the markup for each player.
     $player_html_markup = [];
     foreach ($items as $item) {
-      // Load the associated file.
-      $file = file_load($item->get('target_id')->getCastedValue());
+      // If this entity has passed validation, we render it.
+      if ($this->validateEntityAgainstPlayer($item)) {
+        // Get render information for this item.
+        $renderInfo = $this->getAudioRenderInfo($item);
 
-      // Get the URL for the file.
-      $file_uri = $file->getFileUri();
-      $url = Url::fromUri(file_create_url($file_uri));
+        // Pass settings for the file.
+        $player_settings['files'][] = [
+          'file' => $renderInfo->url->toString(),
+          'title' => $renderInfo->description,
+          'unique_id' => $renderInfo->id,
+        ];
 
-      // Get the file description - use the filename if it doesn't exist.
-      $file_description = $item->get('description')->getString();
-      if (empty($file_description)) {
-        $file_description = $file->getFilename();
+        // Generate HTML markup.
+        $player_html_markup[] = '<div class="wordpressaudio_frame"><div class="wordpressaudioplayer" id="wordpressaudioplayer_' . $renderInfo->id . '">' . $renderInfo->description . '</div></div>';
       }
-
-      // Used to generate unique container.
-      $random_generator = new Random();
-      $unique_id = $file->get('fid')->getValue()[0]['value'] . '_' . $random_generator->name(16, TRUE);
-
-      // Pass settings for the file.
-      $player_settings['files'][] = [
-        'file' => $url->toString(),
-        'title' => $file_description,
-        'unique_id' => $unique_id,
-      ];
-
-      // Generate HTML markup.
-      $player_html_markup[] = '<div class="wordpressaudio_frame"><div class="wordpressaudioplayer" id="wordpressaudioplayer_' . $unique_id . '">' . $file_description . '</div></div>';
     }
 
     // If we are combining into a single player, make some modifications.
@@ -112,33 +93,24 @@ class WordPressAudioPlayer implements AudioFieldPluginInterface {
     }
 
     return [
-      '#type' => 'markup',
-      '#prefix' => '<div class="audiofield">',
-      '#markup' => Markup::create($markup),
-      '#suffix' => '</div>',
+      'audioplayer' => [
+        '#prefix' => '<div class="audiofield">',
+        '#markup' => Markup::create($markup),
+        '#suffix' => '</div>',
+      ],
+      'downloads' => $this->createDownloadList($items, $settings),
       '#attached' => [
         'library' => [
           // Attach the WordPress library.
-          'audiofield/audiofield.wordpress',
+          'audiofield/audiofield.' . $this->getPluginLibrary(),
         ],
         'drupalSettings' => [
           'audiofieldwordpress' => [
-            $unique_id => $player_settings,
+            $renderInfo->id => $player_settings,
           ],
         ],
       ],
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkInstalled() {
-    // Load the library.
-    $library = \Drupal::service('library.discovery')->getLibraryByName('audiofield', 'audiofield.wordpress');
-
-    // Check if the WordPress library has been installed.
-    return file_exists(DRUPAL_ROOT . '/' . $library['js'][0]['data']);
   }
 
 }

@@ -2,10 +2,9 @@
 
 namespace Drupal\audiofield\Plugin\AudioPlayer;
 
-use Drupal\audiofield\AudioFieldPluginInterface;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Url;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\audiofield\AudioFieldPluginBase;
 
 /**
  * Implements the Default HTML5 Audio Player plugin.
@@ -13,47 +12,44 @@ use Drupal\Core\Field\FieldItemListInterface;
  * @AudioPlayer (
  *   id = "default_mp3_player",
  *   title = @Translation("default HTML5 audio player"),
+ *   description = @Translation("Default html5 player - built into HTML specification."),
  *   fileTypes = {
- *     "mp3","mp4","webm","ogg", "m4a","flac"
+ *     "mp3", "mp4", "m4a", "3gp", "aac", "wav", "ogg", "oga", "flac", "webm",
  *   },
- *   description = "Default html5 player to play audio files."
+ *   libraryName = "default",
+ *   librarySource = "",
  * )
  */
-class DefaultMp3Player implements AudioFieldPluginInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function description() {
-    return t('Plugin for use of the built-in HTML5 audio player for display of audio files.');
-  }
+class DefaultMp3Player extends AudioFieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function renderPlayer(FieldItemListInterface $items, $langcode, $settings) {
-    $render = array();
+    $render = [];
+
     foreach ($items as $item) {
-      // Load the associated file.
-      $file = file_load($item->get('target_id')->getCastedValue());
+      $markup = '';
+      // If this entity has passed validation, we render it.
+      if ($this->validateEntityAgainstPlayer($item)) {
+        // Get render information for this item.
+        $renderInfo = $this->getAudioRenderInfo($item);
 
-      // Get the file URL.
-      $file_uri = $file->getFileUri();
-      $url = Url::fromUri(file_create_url($file_uri));
-
-      // Get the file description - use the filename if it doesn't exist.
-      $file_description = $item->get('description')->getString();
-      if (empty($file_description)) {
-        $file_description = $file->getFilename();
+        $markup = '<audio controls>
+             <source src="' . $renderInfo->url->toString() . '" type="audio/mpeg">
+             Your browser does not support the audio element.
+          </audio>
+          <label>' . $renderInfo->description . '</label>';
       }
 
-      $markup = "<audio controls>
-               <source src='" . $url->toString() . "' type='audio/mpeg'>
-               Your browser does not support the audio element.
-            </audio>
-            <label>" . $file_description . "</label>";
-      $render[] = ['#markup' => Markup::create($markup)];
+      $render[] = [
+        '#markup' => Markup::create($markup),
+      ];
     }
+
+    // Add download links.
+    $render[] = $this->createDownloadList($items, $settings);
+
     return $render;
   }
 

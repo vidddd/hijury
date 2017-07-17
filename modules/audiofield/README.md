@@ -4,7 +4,8 @@ Audiofield Module Readme
 
 <strong>Project URL</strong> - https://www.drupal.org/project/audiofield
 
-This module creates a new formatter to play audio files.
+This module creates a new formatter to play either uploaded audio files or
+audio links using the File or Link modules.
 
 It introduces a new plugin manager <strong>AudioPlayer</strong>
 
@@ -50,20 +51,32 @@ MediaElement Audio Player
   MediaElement requires installation of the MediaElement library located at
   http://mediaelementjs.com/ - these files should be downloaded and placed
   in /libraries/mediaelement such that the file mediaelement-and-player.min.js
-  is found at /libraries/mediaelement/build/..
+  is found at /libraries/mediaelement/build/.
+
+Projekktor Audio Player
+  Projekktor requires installation of the Projekktor library located at
+  http://www.projekktor.com - these files should be downloaded and placed
+  in /libraries/projekktor such that the file projekktor-1.3.09.min.js is found
+  at /libraries/projekktor/.
 
 SoundManager Audio Player
   WordPress Audio Player requires installation of the SoundManager library
   located at http://www.schillmania.com/projects/soundmanager2
   These files should be downloaded and placed in /libraries/soundmanager such
   that the file soundmanager2-nodebug-jsmin.js can be found at
-  /libraries/soundmanager/script.
+  /libraries/soundmanager/script/.
 
   SoundManager is a highly configurable library. However, handling and allowing
   for all of the possible configurations and implementations of SoundManager is
   outside the scope of this module. As such, we have included several of the
   "built-in" themes available in SoundManager's demos. Any further customization
   of the player must be done outside of this module.
+
+Wavesurfer Audio Player
+  Wavesurfer requires installation of the Wavesurfer library located at
+  https://github.com/katspaugh/wavesurfer.js - these files should be downloaded
+  and placed in /libraries/wavesurfer such that the file pwavesurfer.min.js is
+  found at /libraries/wavesurfer/dist/.
 
 WordPress Audio Player
   WordPress Audio Player requires installation of the Standalone version of
@@ -81,14 +94,13 @@ Configuration
 -------------
 
 Configuration for the module is performed by modifying field display settings
-for File uploads. You begin by selecting Audiofield as the format for your
-files at /admin/structure/types/manage/CONTENT_TYPE/display . You can then
-modify the format settings - select your audio player from the list and
-you will be presented with additional configuration options for your selected
-audio player.
+for File uploads or for Link entities. You begin by selecting Audiofield as the
+format for your file or link fields at
+/admin/structure/types/manage/CONTENT_TYPE/display . You can then modify the
+format settings - select your audio player from the list and you will be
+presented with additional configuration options for your selected audio player.
 
 Maintainers
 ------
 
-Tamer Zoubi - <tamerzg@gmail.com>
 Daniel Moberly - <daniel.moberly@gmail.com>

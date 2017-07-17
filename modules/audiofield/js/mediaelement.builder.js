@@ -4,11 +4,13 @@
  */
 
 (function ($, Drupal) {
-  Drupal.behaviors.audiofield = {
+  Drupal.behaviors.audiofieldmediaelement = {
     attach: function (context, settings) {
       $.each(drupalSettings.audiofieldmediaelement, function (key, setting_entry) {
+        // Loop over each file.
         $.each(setting_entry.elements, function (key, file_entry) {
-          $(file_entry).mediaelementplayer({
+          // Create the media player.
+          $(file_entry, context).once('generate-mediaelement').mediaelementplayer({
             startVolume: setting_entry.volume,
             loop: false,
             enableAutosize: true,

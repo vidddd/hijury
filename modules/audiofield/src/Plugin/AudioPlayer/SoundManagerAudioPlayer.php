@@ -2,10 +2,9 @@
 
 namespace Drupal\audiofield\Plugin\AudioPlayer;
 
-use Drupal\audiofield\AudioFieldPluginInterface;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Url;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\audiofield\AudioFieldPluginBase;
 
 /**
  * Implements the SoundManager Audio Player plugin.
@@ -13,20 +12,15 @@ use Drupal\Core\Field\FieldItemListInterface;
  * @AudioPlayer (
  *   id = "soundmanager_audio_player",
  *   title = @Translation("SoundManager audio player"),
+ *   description = @Translation("Simple, reliable cross-platform audio."),
  *   fileTypes = {
- *     "mp3", "mp4", "ogg", "opus", "wav",
+ *     "mp3", "mp4", "ogg", "oga", "wav", "flac",
  *   },
- *   description = "SoundManager player to play audio files."
+ *   libraryName = "soundmanager",
+ *   librarySource = "http://www.schillmania.com/projects/soundmanager2",
  * )
  */
-class SoundManagerAudioPlayer implements AudioFieldPluginInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function description() {
-    return t('Plugin for use of the SoundManager audio player for display of audio files. Player can be found at http://www.schillmania.com/projects/soundmanager2');
-  }
+class SoundManagerAudioPlayer extends AudioFieldPluginBase {
 
   /**
    * {@inheritdoc}
@@ -34,9 +28,8 @@ class SoundManagerAudioPlayer implements AudioFieldPluginInterface {
   public function renderPlayer(FieldItemListInterface $items, $langcode, $settings) {
     // Check to make sure we're installed.
     if (!$this->checkInstalled()) {
-      drupal_set_message(t('Error: audiofield library is not currently installed! See the @status_report for more information.', [
-        '@status_report' => \Drupal::l(t('status report'), Url::fromRoute('system.status')),
-      ]), 'error');
+      // Show the error.
+      $this->showInstallError();
 
       // Simply return the default rendering so the files are still displayed.
       $default_player = new DefaultMp3Player();
@@ -47,42 +40,35 @@ class SoundManagerAudioPlayer implements AudioFieldPluginInterface {
     $player_settings = array(
       // SoundManager expects this as a 0 - 100 range.
       'volume' => ($settings['audio_player_initial_volume'] * 10),
-      'swfpath' => '/libraries/soundmanager/swf/',
+      'swfpath' => $this->getPluginLibraryPath() . '/swf/',
     );
 
     $markup = '';
     // Loop over each item.
     foreach ($items as $item) {
-      // Load the associated file.
-      $file = file_load($item->get('target_id')->getCastedValue());
+      // If this entity has passed validation, we render it.
+      if ($this->validateEntityAgainstPlayer($item)) {
+        // Get render information for this item.
+        $renderInfo = $this->getAudioRenderInfo($item);
 
-      // Get the URL for the file.
-      $file_uri = $file->getFileUri();
-      $url = Url::fromUri(file_create_url($file_uri));
+        // Generate HTML markup for the player (different for each theme).
+        switch ($settings['audio_player_soundmanager_theme']) {
+          case 'default':
+            $markup .= '<div class="soundmanageraudio_frame"><a href="' . $renderInfo->url->toString() . '" class="sm2_button">' . $renderInfo->description . '</a> <label>' . $renderInfo->description . '</label></div>';
+            break;
 
-      // Get the file description - use the filename if it doesn't exist.
-      $file_description = $item->get('description')->getString();
-      if (empty($file_description)) {
-        $file_description = $file->getFilename();
-      }
+          case 'player360':
+            $markup .= '<div class="ui360"><a href="' . $renderInfo->url->toString() . '">' . $renderInfo->description . '</a></div>';
+            break;
 
-      // Generate HTML markup for the player (different for each theme).
-      switch ($settings['audio_player_soundmanager_theme']) {
-        case 'default':
-          $markup .= '<div class="soundmanageraudio_frame"><a href="' . $url->toString() . '" class="sm2_button">' . $file_description . '</a> <label>' . $file_description . '</label></div>';
-          break;
+          case 'barui':
+            $markup .= '<li><a href="' . $renderInfo->url->toString() . '">' . $renderInfo->description . '</a></li>';
+            break;
 
-        case 'player360':
-          $markup .= '<div class="ui360"><a href="' . $url->toString() . '">' . $file_description . '</a></div>';
-          break;
-
-        case 'barui':
-          $markup .= '<li><a href="' . $url->toString() . '">' . $file_description . '</a></li>';
-          break;
-
-        case 'inlineplayer':
-          $markup .= '<ul class="graphic"><li><a href="' . $url->toString() . '">' . $file_description . '</a></li></ul>';
-          break;
+          case 'inlineplayer':
+            $markup .= '<ul class="graphic"><li><a href="' . $renderInfo->url->toString() . '">' . $renderInfo->description . '</a></li></ul>';
+            break;
+        }
       }
     }
 
@@ -147,32 +133,24 @@ class SoundManagerAudioPlayer implements AudioFieldPluginInterface {
     }
 
     return [
-      '#prefix' => '<div class="audiofield">',
-      '#markup' => Markup::create($markup),
-      '#suffix' => '</div>',
+      'audioplayer' => [
+        '#prefix' => '<div class="audiofield">',
+        '#markup' => Markup::create($markup),
+        '#suffix' => '</div>',
+      ],
+      'downloads' => $this->createDownloadList($items, $settings),
       '#attached' => [
         'library' => [
           // Attach the SoundManager library.
-          'audiofield/audiofield.soundmanager',
+          'audiofield/audiofield.' . $this->getPluginLibrary(),
           // Attach the skin library.
-          'audiofield/audiofield.soundmanager.' . $settings['audio_player_soundmanager_theme'],
+          'audiofield/audiofield.' . $this->getPluginLibrary() . '.' . $settings['audio_player_soundmanager_theme'],
         ],
         'drupalSettings' => [
           'audiofieldsoundmanager' => $player_settings,
         ],
       ],
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkInstalled() {
-    // Load the library.
-    $library = \Drupal::service('library.discovery')->getLibraryByName('audiofield', 'audiofield.soundmanager');
-
-    // Check if the SoundManager library has been installed.
-    return file_exists(DRUPAL_ROOT . '/' . $library['js'][0]['data']);
   }
 
 }
