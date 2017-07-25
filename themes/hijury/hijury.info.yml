@@ -23,3 +23,5 @@ stylesheets-remove:
   - core/themes/stable/css/system/components/sticky-header.module.css
   - core/themes/stable/css/system/components/tabledrag.module.css
   - core/themes/stable/css/system/components/tablesort.module.css
+  - core/assets/vendor/jquery.ui/themes/base/theme.css
+  - core/assets/vendor/jquery.ui/themes/base/tabs.css

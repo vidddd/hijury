@@ -56,17 +56,19 @@
             <li><a href="#campanaintegrada">Campaña integrada</a></li>
             {% if node.field_videoe.value %}<li><a href="#tv">TV</a></li>{% endif %}
             {% if node.field_graficaimg.value %}<li><a href="#grafica">Gráfica</a></li>{% endif %}
-            {% if node.field_digital_imagen.value %}<li><a href="digital">Digital</a></li>{% endif %}
-            {% if node.field_audios.value %}<li><a href="radio">Radio</a></li>{% endif %}
+            {% if node.field_digital_imagen.value %}<li><a href="#digital">Digital</a></li>{% endif %}
+            {% if node.field_audios.value %}<li><a href="#radio">Radio</a></li>{% endif %}
         </ul>
       </nav>
 
   <section id="case">
-
     <article class="cuadricula">
      <div id="campanaintegrada">
       <div class="item imagen">
-          <img src="{{ file_url(node.field_foto_theinside.entity.uri.value) }}">
+      <!-- <img src="{{ file_url(node.field_foto_theinside.entity.uri.value) }}">  -->
+        {# image_style(node.field_foto_theinside.entity.fid.value, {'campana_'} ) #}
+
+       <img src="{{ node.field_foto_theinside.entity.uri.value | image_style('512x512crop') }}">
         </div>
         <div class="item texto">
           <div class="centrador">
@@ -90,19 +92,20 @@
         </div>
       -->
     </div>
-    <div id="grafica">
+    <div id="grafica" style="display:none">
+        <h2>grafica</h2>
     </div>
-    <div id="tv">
+    <div id="tv" style="display:none">
+        <h2>tv</h2>
     </div>
-    <div id="radio">
+    <div id="radio" style="display:none">
+        <h2>Radio</h2>
     </div>
-    <div id="digital">
+    <div id="digital" style="display:none">
+        <h2>digital</h2>
     </div>
-
-          <pre> {{ dump(node.field_foto_theinside) }} </pre>
+          <pre>   {{ dump (node.field_foto_theinside.entity.fid.value) }} </pre>
     </article>
-
-
   </section>
 </div>
 </div>{# /.main #}

@@ -118,7 +118,13 @@ nav li{
 nav li:hover, nav .marcado{
 	border-bottom:solid 1px #666;
 }
-
+nav li a{
+	text-decoration:none;
+		color:#666;
+}
+nav li:hover, nav li a:hover, nav .marcado{
+	border-bottom:solid 1px #666;
+}
 /*--------- case -------------*/
 
 
