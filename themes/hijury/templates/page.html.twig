@@ -3,6 +3,9 @@
  * @file
  * Theme override to display a single page.
  *
+ * The doctype, html, head and body tags are not in this template. Instead they
+ * can be found in the html.html.twig template in this directory.
+ *
  * Available variables:
  *
  * General utility variables:
@@ -41,71 +44,5 @@
  */
 #}
 <div class="main">
-  <header role="banner">
-    <div class="headertop">
-          <div class="logo"><img src="{{ file_url(node.field_foto_general.entity.uri.value) }}"></div>
-          <div class="descripcion">
-              <h1>{{ node.label }}</h1>
-              <p> {{ node.field_introduccion.value }}</p>
-          </div>
-      </div>
-    </header>
-    <div id="ptabs" class="ui-tabs">
-      <nav>
-        <ul>
-            <li><a href="#campanaintegrada">Campaña integrada</a></li>
-            {% if node.field_videoe.value %}<li><a href="#tv">TV</a></li>{% endif %}
-            {% if node.field_graficaimg.value %}<li><a href="#grafica">Gráfica</a></li>{% endif %}
-            {% if node.field_digital_imagen.value %}<li><a href="#digital">Digital</a></li>{% endif %}
-            {% if node.field_audios.value %}<li><a href="#radio">Radio</a></li>{% endif %}
-        </ul>
-      </nav>
-
-  <section id="case">
-    <article class="cuadricula">
-     <div id="campanaintegrada">
-      <div class="item imagen">
-      <!-- <img src="{{ file_url(node.field_foto_theinside.entity.uri.value) }}">  -->
-        {# image_style(node.field_foto_theinside.entity.fid.value, {'campana_'} ) #}
-
-       <img src="{{ node.field_foto_theinside.entity.uri.value | image_style('512x512crop') }}">
-        </div>
-        <div class="item texto">
-          <div class="centrador">
-                <h2>The Inside</h2>
-                <p>{{ node.field_the_inside.value }}</</p>
-            </div>
-        </div>
-        <div class="item texto" style="">
-          <div class="centrador">
-                <h2>The Idea</h2>
-                <p>{{ node.field_the_idea.value }}</</p>
-            </div>
-        </div>
-        <!--
-        <div class="item radio" style="background-image:url({{ file_url('themes/hijury/images/bg_player_test.jpg') }})">
-          <div class="centrador">
-                <h2>Radio</h2>
-                <p>Cuña Ecocopa 30"</p>
-                <p><img src="{{ file_url('themes/hijury/images/play.png') }}" class="audioboton"></p>
-            </div>
-        </div>
-      -->
-    </div>
-    <div id="grafica" style="display:none">
-        <h2>grafica</h2>
-    </div>
-    <div id="tv" style="display:none">
-        <h2>tv</h2>
-    </div>
-    <div id="radio" style="display:none">
-        <h2>Radio</h2>
-    </div>
-    <div id="digital" style="display:none">
-        <h2>digital</h2>
-    </div>
-          <pre>   {{ dump (node.field_foto_theinside.entity.fid.value) }} </pre>
-    </article>
-  </section>
-</div>
+      {{ page.content }}
 </div>{# /.main #}
