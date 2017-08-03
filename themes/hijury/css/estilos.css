@@ -141,7 +141,7 @@ nav li:hover, nav li a:hover, nav .marcado{
 
 .visorvideos .left_arrow, .visorvideos .right_arrow{
 	float: left;
-	background-image: url(images/bg_lineas.jpg);
+	background-image: url(../images/bg_lineas.jpg);
 	background-repeat: repeat;
 	background-position: left top;
 	overflow:hidden;
@@ -154,7 +154,7 @@ nav li:hover, nav li a:hover, nav .marcado{
 
 
 .visorvideos .left_arrow .flecha{
-	background-image: url(images/arrow_izq.png);
+	background-image: url(../images/arrow_izq.png);
 	background-repeat: no-repeat;
 	background-position: left top;
 	margin: 0px;
@@ -169,7 +169,7 @@ nav li:hover, nav li a:hover, nav .marcado{
 }
 
 .visorvideos .right_arrow .flecha{
-	background-image: url(images/arrow_dch.png);
+	background-image: url(../images/arrow_dch.png);
 	background-repeat: no-repeat;
 	background-position: right top;
 	margin: 0px;

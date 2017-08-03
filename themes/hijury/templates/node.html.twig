@@ -83,10 +83,10 @@
     <nav>
       <ul>
           <li><a href="#campanaintegrada">Campaña integrada</a></li>
-          {% if content.field_videoe %}<li><a href="#tv">TV</a></li>{% endif %}
-          {% if content.field_graficaimg %}<li><a href="#grafica">Gráfica</a></li>{% endif %}
-          {% if content.field_digital_imagen %}<li><a href="#digital">Digital</a></li>{% endif %}
-          {% if content.field_audios %}<li><a href="#radio">Radio</a></li>{% endif %}
+          {% if content.group_tabs['group_tv'] %}<li><a href="#tv">TV</a></li>{% endif %}
+          {% if content.group_tabs['group_grafica'] %}<li><a href="#grafica">Gráfica</a></li>{% endif %}
+          {% if content.group_tabs['group_digital'] %}<li><a href="#digital">Digital</a></li>{% endif %}
+          {% if content.group_tabs['group_radio'] %}<li><a href="#radio">Radio</a></li>{% endif %}
       </ul>
     </nav>
 
@@ -161,10 +161,31 @@
       {% endif %}
   </div>
   <div id="grafica" style="display:none">
-      <h2>grafica</h2>
+   {% for grafi in content.group_tabs['group_grafica'].field_graficaimg['#items'] %}
+      <div class="item imagen">
+           <img src="{{ grafi.entity.uri.value | image_style('512x512crop') }}">
+      </div>
+      {{ dump(grafi) }}
+      
+  {% endfor %}
   </div>
   <div id="tv" style="display:none">
-      <h2>tv</h2>
+
+      <article class="visorvideos">
+          <div class="left_arrow">
+              <div class="flecha"></div>
+            </div>
+            <div class="videocontainer">
+              <iframe src="https://player.vimeo.com/video/215309507?byline=0&portrait=0" width="1024" height="576" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+            </div>
+            <div class="right_arrow">
+              <div class="flecha"></div>
+            </div>
+            <div class="contador">
+              1/3
+            </div>
+        </article>
+            {{ dump(content.group_tabs['group_tv'].field_videoe['#items'][0]) }}
   </div>
   <div id="radio" style="display:none">
       <h2>Radio</h2>
@@ -172,8 +193,7 @@
   <div id="digital" style="display:none">
       <h2>digital</h2>
   </div>
-
   </article>
 </section>
-<pre style="clear:both;">      {{ dump(content.field_foto_theinside['#items'][0].entity.fid.value) }}</pre>
+<pre style="clear:both;"></pre>
 </div>
