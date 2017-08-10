@@ -4,7 +4,7 @@ description: 'Theme for hijury'
 core: 8.x
 libraries:
   - fluffiness/global-styling
-  - hijury/global
+  - hijury/global2
 base theme: stable
 regions:
   header: Header
@@ -25,3 +25,6 @@ stylesheets-remove:
   - core/themes/stable/css/system/components/tablesort.module.css
   - core/assets/vendor/jquery.ui/themes/base/theme.css
   - core/assets/vendor/jquery.ui/themes/base/tabs.css
+  - core/themes/stable/css/contextual/contextual.module.css
+  - core/themes/stable/css/contextual/contextual.theme.css
+  - core/themes/stable/css/contextual/contextual.icons.theme.css

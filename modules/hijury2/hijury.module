@@ -1,0 +1,35 @@
+<?php
+
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/*
+function hijury_user_login($account) {
+  $url = "/admin/content";
+  echo "1111"; die;
+  $response = new Symfony\Component\HttpFoundation\RedirectResponse($url);
+  $response->send();
+  return;
+
+        }
+
+function _hijury_form_alter(&$form, \Drupal\Core\Form\FormStateInterface\FormStateInterface $form_state, $form_id) {
+    echo "2222"; die;
+  switch ($form_id) {
+    // Alter login form and add own custom submit handler.
+    case 'user_login_form':
+        
+      $form['#submit'][] = '_hijury_user_login_form_submit';
+      break;
+  }
+}
+
+
+function _hijury_user_login_form_submit($form, FormStateInterface $form_state) {
+  // Set redirect to login form.
+     echo "3333"; die;
+  $form_state->setRedirect('/admin/content');
+}*/

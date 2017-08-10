@@ -8,6 +8,7 @@ body{
 	color:#666;
 	font-size:14px;
 	font-weight:400;
+	float:left;
 }
 div, header, section, article, img, nav{
 	border:none 0px;
@@ -20,16 +21,25 @@ section{
 	height:auto;
 }
 h1{
-	font-weight:800;
-	font-size:45px;
-	margin:0 auto;
-	padding:10px 0;
+	font-weight: 800;
+    font-size: 45px;
+    margin: 0 auto;
+    padding: 10px 0;
+    line-height: 45px;
 }
 h2{
 	font-weight:800;
 	font-size:38px;
 	margin:0 auto;
 	padding:0 0;
+	line-height: 38px;	
+}
+h3{
+	font-weight:500;
+	font-size:28px;
+	margin:0 auto;
+	padding:0 0;
+	line-height: 32px;
 }
 p{
 	margin:0 auto;
@@ -78,7 +88,7 @@ header{
 	height:auto;
 }
 .descripcion{
-	width:500px;
+	width:600px;
 	margin:10px auto;
 }
 
@@ -120,11 +130,9 @@ nav li:hover, nav .marcado{
 }
 nav li a{
 	text-decoration:none;
-		color:#666;
+	color:#666;
 }
-nav li:hover, nav li a:hover, nav .marcado{
-	border-bottom:solid 1px #666;
-}
+
 /*--------- case -------------*/
 
 
